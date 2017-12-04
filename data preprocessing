@@ -1,0 +1,81 @@
+import numpy as np
+import pandas as pd
+
+data = pd.read_csv(
+        'C:\\Users\\think\\Desktop\\kaggle\\titanic\\train.csv')
+
+
+data.info()
+
+#提取称谓
+title_1 = data.Name.str.split(',',expand = True)
+title_2 = title_1[1].str.split('.',expand = True)
+title = title_2[0].rename('title')
+title = title.rename('title')
+
+title = pd.DataFrame(title)
+
+title_count = title.groupby(by = 'title',as_index = False)['title'].agg({'number':np.size})
+
+dic = list(title.title.unique())
+
+for x in dic:
+    print(x)
+
+dic = {
+        'Capt':'rare',
+            'Col':'rare',
+            'Don':'rare',
+            'Dr':'rare',
+            'Jonkheer':'rare',
+            'Lady':'Miss',
+            'Major':'Major',
+            'Master':'Master',
+            'Miss':'Miss',
+            'Mlle':'Miss',
+            'Mme':'Mrs',
+            'Mr':'Mr',
+            'Mrs':'Mrs',
+            'Ms':'Miss',
+            'Rev':'rare',
+            'Sir':'rare',
+            'the Countess':'rare'
+            }
+
+
+title['title'] = title['title'].str.strip()
+title['title'] = title['title'].map(dic)
+
+data['title'] = title['title']
+
+#划分家庭类型
+data['family_size'] = data['SibSp'] + data['Parch'] + 1
+
+lst = []
+
+for index,row in data.iterrows():
+    size = row['family_size']
+    if size == 1:
+        lst.append('single')
+    if size > 1 and size < 5:
+        lst.append('small')
+    if size > 4:
+        lst.append('large')
+
+data['family_size'] = pd.Series(lst)
+
+
+data[np.isnan(data.Fare)]
+
+data.info()
+
+#预测年龄
+age = data[~np.isnan(data['Age'])]
+
+import matplotlib
+import matplotlib.pyplot as plt
+
+from sklearn.model_selection import train_test_split
+
+
+plt.hist(data[~np.isnan(data['Age'])]['Age'])
